@@ -7,7 +7,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 # create engine with env
 load_dotenv()
-URL = os.getenv("URL")
+password = os.getenv("PASSWORD")
+URL = f"postgresql+psycopg2://postgres:{password}@localhost"
 
 
 # define table classes
@@ -72,5 +73,5 @@ def get_db():
         db.close()
 
 
-if __name__ == "__main__":
-    Base.metadata.create_all(bind=engine)
+# if __name__ == "__main__":
+#     # Base.metadata.create_all(bind=engine)
