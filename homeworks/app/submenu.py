@@ -1,11 +1,11 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Path
-from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
-
 from database import crud, schemas
 from database.database import get_db
+from fastapi import Depends, HTTPException, Path
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 
 from .main import v1
 
@@ -16,7 +16,7 @@ def get_all_submenu(
     menu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
     db: Session = Depends(get_db),
 ):
-    return crud.get_all_submenus(db, menu_id)
+    return jsonable_encoder(crud.get_all_submenus(db, menu_id))
 
 
 @v1.get("/menus/{menu_id}/submenus/{submenu_id}", response_class=JSONResponse)
@@ -28,10 +28,10 @@ def get_submenu(
     submenu = crud.get_submenu_by_id(db, menu_id=menu_id, submenu_id=submenu_id)
     if submenu is None:
         raise HTTPException(status_code=404, detail="submenu not found")
-    d_submenu = submenu.__dict__
-    d_submenu["id"] = str(d_submenu["id"])
-    d_submenu["dishes_count"] = submenu.dishes_in
-    return d_submenu
+    respnose = submenu.__dict__
+    respnose["id"] = str(submenu.id)
+    respnose["dishes_count"] = submenu.dishes_in
+    return jsonable_encoder(respnose)
 
 
 # Create
@@ -44,7 +44,7 @@ def create_new_submenu(
     submenu.to_menu = menu_id
     submenu = crud.create_submenu(db, submenu)
     submenu.id = str(submenu.id)
-    return submenu
+    return jsonable_encoder(submenu)
 
 
 # Update
@@ -64,7 +64,7 @@ def update_submenu(
     )
     if submenu is None:
         raise HTTPException(status_code=404)
-    return submenu
+    return jsonable_encoder(submenu)
 
 
 # Delete

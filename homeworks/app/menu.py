@@ -35,11 +35,11 @@ async def get_menu(
     menu = crud.get_menu_by_id(db, menu_id=menu_id)
     if menu is None:
         raise HTTPException(status_code=404, detail="menu not found")
-    d_menu = menu.__dict__
-    d_menu["id"] = str(menu.id)
-    d_menu["submenus_count"] = menu.submenus_in
-    d_menu["dishes_count"] = menu.dishes_in
-    return d_menu
+    response = menu.__dict__
+    response["id"] = str(menu.id)
+    response["submenus_count"] = menu.submenus_in
+    response["dishes_count"] = menu.dishes_in
+    return response
 
 
 # UPDATE
