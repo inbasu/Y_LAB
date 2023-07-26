@@ -1,14 +1,12 @@
 import os
 
-from dotenv import load_dotenv
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.orm import DeclarativeBase, relationship, sessionmaker
 from sqlalchemy.ext.hybrid import hybrid_property
 
 # create engine with env
-load_dotenv()
-password = os.getenv("PASSWORD")
-URL = f"postgresql+psycopg2://postgres:{password}@localhost"
+
+URL = os.getenv("DATABASE_URL")
 
 
 # define table classes
@@ -73,5 +71,8 @@ def get_db():
         db.close()
 
 
-# if __name__ == "__main__":
-#     # Base.metadata.create_all(bind=engine)
+def create_data_base():
+    try:
+        Base.metadata.create_all(bind=engine)
+    finally:
+        pass

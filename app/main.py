@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException, Path
-
+from database.database import create_data_base
 app = FastAPI()
 v1 = FastAPI()
 
@@ -27,3 +27,7 @@ from .dish import (
 )
 
 app.mount("/api/v1", v1)
+
+@app.on_event("startup")
+async def database():
+    create_data_base()

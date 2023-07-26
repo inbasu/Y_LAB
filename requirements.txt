@@ -2,4 +2,4 @@ fastapi==0.100.0
 sqlalchemy>=2.0
 uvicorn>=0.2
 python-dotenv==1
-psycopg2
+psycopg2-binary==2.9.6
