@@ -69,10 +69,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-def create_data_base():
-    try:
-        Base.metadata.create_all(bind=engine)
-    finally:
-        pass

@@ -1,5 +1,6 @@
 __pycache__
 .vscode
 .env
+.pytest_cashe
 *.code-workspace
 venv

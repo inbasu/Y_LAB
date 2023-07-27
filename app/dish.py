@@ -33,7 +33,6 @@ def get_dish(
     dish = crud.get_dish_by_id(db, submenu_id=submenu_id, dish_id=dish_id)
     if dish is None:
         raise HTTPException(status_code=404, detail="dish not found")
-    dish.id = str(dish.id)
     return dish
 
 
@@ -51,7 +50,6 @@ def create_new_dish(
 ):
     dish.to_submenu = submenu_id
     dish = crud.create_dish(db, dish)
-    dish.id = str(dish.id)
     return dish
 
 

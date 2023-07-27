@@ -17,7 +17,6 @@ def create_new_menu(
     db: Session = Depends(get_db),
 ):
     menu = crud.create_menu(db, menu)
-    menu.id = str(menu.id)
     return menu
 
 
@@ -36,7 +35,6 @@ async def get_menu(
     if menu is None:
         raise HTTPException(status_code=404, detail="menu not found")
     response = menu.__dict__
-    response["id"] = str(menu.id)
     response["submenus_count"] = menu.submenus_in
     response["dishes_count"] = menu.dishes_in
     return response

@@ -29,7 +29,6 @@ def get_submenu(
     if submenu is None:
         raise HTTPException(status_code=404, detail="submenu not found")
     respnose = submenu.__dict__
-    respnose["id"] = str(submenu.id)
     respnose["dishes_count"] = submenu.dishes_in
     return jsonable_encoder(respnose)
 
@@ -43,7 +42,6 @@ def create_new_submenu(
 ):
     submenu.to_menu = menu_id
     submenu = crud.create_submenu(db, submenu)
-    submenu.id = str(submenu.id)
     return jsonable_encoder(submenu)
 
 
