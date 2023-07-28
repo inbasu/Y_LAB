@@ -9,6 +9,5 @@ Tests:
 To run test :
 
 ``` docker-compose -f docker-compose.test.yml up  --build ```
-:w
 
 After tests stop postgres CTRL + C and ``` docker rm postgres   ```
