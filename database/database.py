@@ -1,8 +1,8 @@
 import os
 
-from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
-from sqlalchemy.orm import DeclarativeBase, relationship, sessionmaker
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import DeclarativeBase, relationship, sessionmaker
 
 # create engine with env
 
@@ -55,7 +55,7 @@ class Dish(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String)
-    price = Column(String)
+    price = Column(Float)
     to_submenu = Column(Integer, ForeignKey("submenu.id", ondelete="CASCADE"))
 
 
