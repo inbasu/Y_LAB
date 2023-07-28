@@ -10,4 +10,4 @@ To run test :
 
 ``` docker-compose -f docker-compose.test.yml up  --build ```
 
-After tests stop postgres CTRL + C and ``` docker rm postgres   ```
+After tests stop postgres 'CTRL + C' and ``` docker rm postgres   ```
