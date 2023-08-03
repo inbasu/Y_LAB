@@ -1,48 +1,42 @@
 from typing import Annotated
 
-from database import crud, schemas
-from database.database import get_db
-from fastapi import Depends, HTTPException, Path
+from fastapi import HTTPException, Path
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
+
+from database import crud, schemas
 
 from .main import v1
+
+Submenu = crud.SubmenuRepository()
 
 
 # READ
 @v1.get("/menus/{menu_id}/submenus")
-def get_all_submenu(
-    menu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
-    db: Session = Depends(get_db),
-):
-    return jsonable_encoder(crud.get_all_submenus(db, menu_id))
+async def get_submenus(menu_id: Annotated[int, Path(title="Submenu ID", ge=1)]):
+    return await Submenu.get_submenus(to_menu=menu_id)
 
 
 @v1.get("/menus/{menu_id}/submenus/{submenu_id}", response_class=JSONResponse)
-def get_submenu(
+async def get_submenu(
     menu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
     submenu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
-    db: Session = Depends(get_db),
 ):
-    submenu = crud.get_submenu_by_id(db, menu_id=menu_id, submenu_id=submenu_id)
+    submenu = await Submenu.get_submenu(to_menu=menu_id, id=submenu_id)
     if submenu is None:
         raise HTTPException(status_code=404, detail="submenu not found")
-    respnose = submenu.__dict__
-    respnose["dishes_count"] = submenu.dishes_in
-    return jsonable_encoder(respnose)
+    return submenu
 
 
 # Create
 @v1.post("/menus/{menu_id}/submenus", response_class=JSONResponse, status_code=201)
-def create_new_submenu(
+async def create_new_submenu(
     menu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
     submenu: schemas.CreateSubMenu,
-    db: Session = Depends(get_db),
 ):
     submenu.to_menu = menu_id
-    submenu = crud.create_submenu(db, submenu)
-    return jsonable_encoder(submenu)
+    submenu = await Submenu.create_submenu(submenu)
+    return submenu
 
 
 # Update
@@ -51,28 +45,24 @@ def create_new_submenu(
     response_class=JSONResponse,
     status_code=200,
 )
-def update_submenu(
+async def update_submenu(
     menu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
     submenu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
     submenu: schemas.UpdateSubMenu,
-    db: Session = Depends(get_db),
 ):
-    submenu = crud.update_submenu_by_id(
-        db, submenu, menu_id=menu_id, submenu_id=submenu_id
-    )
+    submenu = await Submenu.update_submenu(submenu, to_menu=menu_id, id=submenu_id)
     if submenu is None:
         raise HTTPException(status_code=404)
-    return jsonable_encoder(submenu)
+    return submenu
 
 
 # Delete
 @v1.delete("/menus/{menu_id}/submenus/{submenu_id}")
-def delete_submenu(
+async def delete_submenu(
     menu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
     submenu_id: Annotated[int, Path(title="Submenu ID", ge=1)],
-    db: Session = Depends(get_db),
 ):
-    result = crud.delte_submenu_by_id(db, menu_id, submenu_id)
+    result = await Submenu.delete_submenu(to_menu=menu_id, id=submenu_id)
     if not result:
         raise HTTPException(status_code=404)
     return {"ok": result}

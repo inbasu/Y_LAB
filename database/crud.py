@@ -1,155 +1,133 @@
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from . import database, schemas
 
 
 # Menu crud
-def get_all_menus(db: Session):
-    return db.query(database.Menu).all()
+class MenuRepository:
+    def __init__(self) -> None:
+        self.__db: Session = database.get_db()
+        self.model = schemas.Menu
 
+    async def get_menus(self) -> list[schemas.Menu]:
+        return self.__db.query(database.Menu).all()
 
-def get_menu_by_id(db: Session, menu_id: int):
-    return db.query(database.Menu).filter(database.Menu.id == menu_id).first()
+    async def get_menu(self, **kwargs) -> schemas.Menu | None:
+        return self.__db.query(database.Menu).filter_by(**kwargs).first()
 
-
-def create_menu(db: Session, menu: schemas.CreateMenu):
-    menu = database.Menu(title=menu.title, description=menu.description)
-    db.add(menu)
-    db.commit()
-    db.refresh(menu)
-    return menu
-
-
-def update_menu_bu_id(db: Session, p_menu: schemas.UpdateMenu, menu_id):
-    menu = db.query(database.Menu).filter(database.Menu.id == menu_id).first()
-    if menu is None:
+    async def create_menu(self, menu: schemas.CreateMenu) -> schemas.Menu:
+        menu = database.Menu(title=menu.title, description=menu.description)
+        self.__db.add(menu)
+        self.__db.commit()
+        self.__db.refresh(menu)
         return menu
-    menu.title = p_menu.title
-    menu.description = p_menu.description
-    db.add(menu)
-    db.commit()
-    db.refresh(menu)
-    return menu
 
+    async def update_menu(
+        self, updated_menu: schemas.UpdateMenu, **kwargs
+    ) -> schemas.Menu | None:
+        menu = self.__db.query(database.Menu).filter_by(**kwargs).first()
+        if menu is None:
+            return menu
+        menu.title = updated_menu.title
+        menu.description = updated_menu.description
+        self.__db.add(menu)
+        self.__db.commit()
+        self.__db.refresh(menu)
+        return menu
 
-def delte_menu_by_id(db: Session, menu_id: int):
-    db.query(database.Menu).filter(database.Menu.id == menu_id).delete()
-    db.commit()
+    async def delte_menu(self, **kwargs) -> None:
+        self.__db.query(database.Menu).filter_by(**kwargs).delete()
+        self.__db.commit()
 
 
 # Sub menu crud
-def get_all_submenus(db: Session, menu_id: int):
-    return db.query(database.SubMenu).filter(database.SubMenu.to_menu == menu_id).all()
+class SubmenuRepository:
+    def __init__(self) -> None:
+        self.__db: Session = database.get_db()
+        self.model = schemas.SubMenu
 
+    async def get_submenus(self, **kwargs) -> list[schemas.SubMenu]:
+        return self.__db.query(database.SubMenu).filter_by(**kwargs).all()
 
-def get_submenu_by_id(db: Session, menu_id: int, submenu_id: int):
-    return (
-        db.query(database.SubMenu)
-        .filter(database.SubMenu.to_menu == menu_id, database.SubMenu.id == submenu_id)
-        .first()
-    )
+    async def get_submenu(self, **kwargs) -> schemas.SubMenu | None:
+        return self.__db.query(database.SubMenu).filter_by(**kwargs).first()
 
-
-def create_submenu(db: Session, submenu: schemas.CreateSubMenu):
-    submenu = database.SubMenu(
-        title=submenu.title, description=submenu.description, to_menu=submenu.to_menu
-    )
-    db.add(submenu)
-    db.commit()
-    db.refresh(submenu)
-    return submenu
-
-
-def update_submenu_by_id(
-    db: Session, p_submenu: schemas.UpdateSubMenu, menu_id: int, submenu_id: int
-):
-    submenu = (
-        db.query(database.SubMenu)
-        .filter(database.SubMenu.to_menu == menu_id, database.SubMenu.id == submenu_id)
-        .first()
-    )
-    if submenu is None:
+    async def create_submenu(self, submenu: schemas.CreateSubMenu) -> schemas.SubMenu:
+        submenu = database.SubMenu(
+            title=submenu.title,
+            description=submenu.description,
+            to_menu=submenu.to_menu,
+        )
+        self.__db.add(submenu)
+        self.__db.commit()
+        self.__db.refresh(submenu)
         return submenu
-    submenu.title = p_submenu.title
-    submenu.description = p_submenu.description
-    db.add(submenu)
-    db.commit()
-    db.refresh(submenu)
-    return submenu
 
+    async def update_submenu(
+        self, p_submenu: schemas.UpdateSubMenu, **kwargs
+    ) -> schemas.SubMenu | None:
+        submenu = self.__db.query(database.SubMenu).filter_by(**kwargs).first()
+        if submenu is None:
+            return submenu
+        submenu.title = p_submenu.title
+        submenu.description = p_submenu.description
+        self.__db.add(submenu)
+        self.__db.commit()
+        self.__db.refresh(submenu)
+        return submenu
 
-def delte_submenu_by_id(db: Session, menu_id: int, submenu_id: int):
-    result = (
-        db.query(database.SubMenu)
-        .filter(database.SubMenu.to_menu == menu_id, database.SubMenu.id == submenu_id)
-        .delete()
-    )
-    db.commit()
-    return bool(result)
+    async def delete_submenu(self, **kwargs) -> bool:
+        query = self.__db.query(database.SubMenu).filter_by(**kwargs)
+        if not query:
+            return False
+        query.delete()
+        self.__db.commit()
+        return True
 
 
 # Dishes CRUD
-def get_all_dishes(db: Session, menu_id: int):
-    return db.query(database.Dish).filter(database.Dish.to_submenu == menu_id).all()
+class DishRepository:
+    def __init__(self) -> None:
+        self.__db: Session = database.get_db()
+        self.model = schemas.Dish
 
+    async def get_dishes(self, **kwargs) -> list[schemas.Dish]:
+        return self.__db.query(database.Dish).filter_by(**kwargs).all()
 
-def get_dish_by_id(db: Session, dish_id: int, submenu_id: int):
-    return (
-        db.query(database.Dish)
-        .filter(database.Dish.to_submenu == submenu_id, database.Dish.id == dish_id)
-        .first()
-    )
+    async def get_dish(self, **kwargs) -> schemas.Dish | None:
+        return self.__db.query(database.Dish).filter_by(**kwargs).first()
 
-
-def create_dish(db: Session, dish: schemas.CreateDish):
-    dish = database.Dish(
-        title=dish.title,
-        description=dish.description,
-        price=dish.price,
-        to_submenu=dish.to_submenu,
-    )
-    db.add(dish)
-    db.commit()
-    db.refresh(dish)
-    return dish
-
-
-def update_dish_by_id(
-    db: Session, p_dish: schemas.UpdateDish, submenu_id: int, dish_id: int
-):
-    dish = (
-        db.query(database.Dish)
-        .filter(database.Dish.to_submenu == submenu_id, database.Dish.id == dish_id)
-        .first()
-    )
-    if dish is None:
+    async def create_dish(self, dish: schemas.CreateDish) -> schemas.Dish:
+        dish = database.Dish(
+            title=dish.title,
+            description=dish.description,
+            price=dish.price,
+            to_submenu=dish.to_submenu,
+        )
+        self.__db.add(dish)
+        self.__db.commit()
+        self.__db.refresh(dish)
         return dish
-    dish.title = p_dish.title
-    dish.description = p_dish.description
-    dish.price = p_dish.price
-    db.add(dish)
-    db.commit()
-    db.refresh(dish)
-    return dish
 
+    async def update_dish(
+        self, p_dish: schemas.UpdateDish, **kwargs
+    ) -> schemas.Dish | None:
+        dish = self.__db.query(database.Dish).filter_by(**kwargs).first()
+        if dish is None:
+            return dish
+        dish.title = p_dish.title
+        dish.description = p_dish.description
+        dish.price = p_dish.price
+        self.__db.add(dish)
+        self.__db.commit()
+        self.__db.refresh(dish)
+        return dish
 
-def delte_dish_by_id(db: Session, submenu_id: int, dish_id: int):
-    result = (
-        db.query(database.Dish)
-        .filter(database.Dish.to_submenu == submenu_id, database.Dish.id == dish_id)
-        .delete()
-    )
-    db.commit()
-    return bool(result)
-
-
-# SUB ACTIONS
-def menu_count(db: Session, submenu_id):
-    pass
-
-
-def submenu_count(db: Session, submenu_id):
-    return (
-        db.query(database.Dish).filter(database.Dish.to_submenu == submenu_id).count()
-    )
+    async def delte_dish(self, **kwargs) -> bool:
+        query = self.__db.query(database.Dish).filter_by(**kwargs)
+        if not query:
+            return False
+        query.delete()
+        self.__db.commit()
+        return True

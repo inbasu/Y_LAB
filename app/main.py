@@ -12,7 +12,7 @@ from .menu import (
 )
 from .submenu import (
     create_new_submenu,
-    get_all_submenu,
+    get_submenus,
     get_submenu,
     update_submenu,
     delete_submenu,
@@ -20,7 +20,7 @@ from .submenu import (
 
 from .dish import (
     create_new_dish,
-    get_all_dishes,
+    get_dishes,
     get_dish,
     update_dish,
     delete_dish,
