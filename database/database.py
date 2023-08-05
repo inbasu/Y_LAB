@@ -6,7 +6,7 @@ from sqlalchemy.orm import DeclarativeBase, relationship, sessionmaker
 
 # create engine with env
 
-URL = os.getenv("DATABASE_URL")
+URL = os.getenv('DATABASE_URL')
 
 
 # define table classes
@@ -15,13 +15,13 @@ class Base(DeclarativeBase):
 
 
 class Menu(Base):
-    __tablename__ = "menu"
+    __tablename__ = 'menu'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String)
     submenu = relationship(
-        "SubMenu", cascade="all, delete", backref=("menu"), lazy="dynamic"
+        'SubMenu', cascade='all, delete', backref=('menu'), lazy='dynamic'
     )
 
     @hybrid_property
@@ -30,18 +30,18 @@ class Menu(Base):
 
     @hybrid_property
     def dishes_in(self):
-        return sum([s.dishes_in for s in self.submenu])
+        return sum(s.dishes_in for s in self.submenu)
 
 
 class SubMenu(Base):
-    __tablename__ = "submenu"
+    __tablename__ = 'submenu'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String)
-    to_menu = Column(Integer, ForeignKey("menu.id", ondelete="CASCADE"))
+    to_menu = Column(Integer, ForeignKey('menu.id', ondelete='CASCADE'))
     dishes = relationship(
-        "Dish", cascade="all, delete", backref=("submenu"), lazy="dynamic"
+        'Dish', cascade='all, delete', backref=('submenu'), lazy='dynamic'
     )
 
     @hybrid_property
@@ -50,13 +50,13 @@ class SubMenu(Base):
 
 
 class Dish(Base):
-    __tablename__ = "dish"
+    __tablename__ = 'dish'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String)
     price = Column(Float)
-    to_submenu = Column(Integer, ForeignKey("submenu.id", ondelete="CASCADE"))
+    to_submenu = Column(Integer, ForeignKey('submenu.id', ondelete='CASCADE'))
 
 
 engine = create_engine(URL)

@@ -1,6 +1,11 @@
-__pycache__
+#Dev
 .vscode
 .env
-.pytest_cashe
 *.code-workspace
 venv
+
+
+#cache
+__pycache__
+.mypy_cache
+.pytest_cache
