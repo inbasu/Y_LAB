@@ -12,9 +12,7 @@ class ModelRepository:
         self.table: type[database.Base] = table
 
     async def get_all(self, **kwargs):
-        if kwargs:
-            return self.db.query(self.table).filter_by(**kwargs).all()
-        return self.db.query(self.table).all()
+        return self.db.query(self.table).filter_by(**kwargs).all()
 
     async def get(self, **kwargs) -> schemas.BaseModel | None:
         return self.db.query(self.table).filter_by(**kwargs).first()
@@ -62,10 +60,7 @@ class SubMenuRepository(ModelRepository):
         self.table: type[database.Base] = database.SubMenu
 
 
-# class DishRepository(ModelRepository):
-#     def __init__(self) -> None:
-#         self.db: Session = database.get_db()
-#         self.table: type[database.Base] = database.Dish
-
-#     async def get_all(self, to_submenu: int) -> list[schemas.SubMenu]:
-#         return self.db.query(database.Dish).filter(to_submenu == to_submenu)
+class DishRepository(ModelRepository):
+    def __init__(self) -> None:
+        self.db: Session = database.get_db()
+        self.table: type[database.Base] = database.Dish
