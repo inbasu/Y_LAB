@@ -13,7 +13,7 @@ class BaseService(ABC):
     database: crud.ModelRepository
     cache: Cache = Cache()
 
-    async def create(self, create_menu):
+    async def create(self, create_menu) -> Base:
         item = await self.database.create(create_menu)
         return item
 
@@ -31,7 +31,7 @@ class BaseService(ABC):
             await self.cache.set(url, jsonable_encoder(item))
         return item
 
-    async def update_all_cache(self, url, **kwargs):
+    async def update_all_cache(self, url, **kwargs) -> None:
         if 'id' in kwargs.keys():
             kwargs.pop('id')
         all_items = await self.database.get_all(**kwargs)

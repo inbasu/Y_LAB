@@ -10,7 +10,7 @@ class ModelRepository:
     db: Session
     table: type[database.Base]
 
-    async def get_all(self, **kwargs):
+    async def get_all(self, **kwargs) -> database.Base:
         return self.db.query(self.table).filter_by(**kwargs).all()
 
     async def get(self, **kwargs) -> database.Base | None:
