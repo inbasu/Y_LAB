@@ -12,9 +12,10 @@ services:
       - 8080:8000
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres/postgres
-
     depends_on:
       postgres-test:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   postgres-test:
@@ -29,3 +30,13 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
+
+  redis:
+    image: redis
+    restart: always
+    expose:
+      - '6379'
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]

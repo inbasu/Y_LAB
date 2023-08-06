@@ -1,12 +1,12 @@
 import os
 
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, create_engine
+from sqlalchemy import Column, Engine, Float, ForeignKey, Integer, String, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, relationship, sessionmaker
 
 # create engine with env
 
-URL = os.getenv('DATABASE_URL')
+URL: str = str(os.getenv('DATABASE_URL'))
 
 
 # define table classes
@@ -59,7 +59,9 @@ class Dish(Base):
     to_submenu = Column(Integer, ForeignKey('submenu.id', ondelete='CASCADE'))
 
 
-engine = create_engine(URL)
+engine: Engine = create_engine(URL)
+
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

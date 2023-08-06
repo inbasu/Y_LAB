@@ -7,17 +7,16 @@ from . import database, schemas
 
 
 class ModelRepository:
-    def __init__(self, table: database.Base) -> None:
-        self.db: Session = database.get_db()
-        self.table: type[database.Base] = table
+    db: Session
+    table: type[database.Base]
 
     async def get_all(self, **kwargs):
         return self.db.query(self.table).filter_by(**kwargs).all()
 
-    async def get(self, **kwargs) -> schemas.BaseModel | None:
+    async def get(self, **kwargs) -> database.Base | None:
         return self.db.query(self.table).filter_by(**kwargs).first()
 
-    async def create(self, create_model: schemas.BaseModel) -> schemas.BaseModel:
+    async def create(self, create_model: schemas.BaseModel) -> database.Base:
         item = self.table(**create_model.model_dump())
         self.db.add(item)
         self.db.commit()
@@ -26,7 +25,7 @@ class ModelRepository:
 
     async def update(
         self, update_model: schemas.BaseModel, **kwargs
-    ) -> schemas.BaseModel | None:
+    ) -> database.Base | None:
         print(kwargs)
         item = self.db.query(self.table).filter_by(**kwargs).first()
         if item is None:
@@ -51,16 +50,16 @@ class ModelRepository:
 class MenuRepository(ModelRepository):
     def __init__(self) -> None:
         self.db: Session = database.get_db()
-        self.table: type[database.Base] = database.Menu
+        self.table: type[database.Menu] = database.Menu
 
 
 class SubMenuRepository(ModelRepository):
     def __init__(self) -> None:
         self.db: Session = database.get_db()
-        self.table: type[database.Base] = database.SubMenu
+        self.table: type[database.SubMenu] = database.SubMenu
 
 
 class DishRepository(ModelRepository):
     def __init__(self) -> None:
         self.db: Session = database.get_db()
-        self.table: type[database.Base] = database.Dish
+        self.table: type[database.Dish] = database.Dish

@@ -6,3 +6,5 @@ psycopg2-binary==2.9.6
 pytest==7.4.0
 httpx>=0.24.1
 alembic==1.11.1
+redis
+types-redis

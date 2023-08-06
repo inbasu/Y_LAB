@@ -37,6 +37,8 @@ services:
   redis_cache:
     image: redis
     restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - '6379:6379'
     volumes:
