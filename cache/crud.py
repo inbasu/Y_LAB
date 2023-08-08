@@ -1,11 +1,11 @@
 import json
 
-from .database import r
+from .database import Redis, r
 
 
 class Cache:
     def __init__(self) -> None:
-        self.db = r
+        self.db: Redis = r
 
     async def get(self, url):
         data = self.db.get(url)
