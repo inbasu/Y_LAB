@@ -2,7 +2,7 @@ import os
 
 from sqlalchemy import Column, Engine, Float, ForeignKey, Integer, String, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import DeclarativeBase, relationship, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, relationship, sessionmaker
 
 # create engine with env
 
@@ -25,11 +25,11 @@ class Menu(Base):
     )
 
     @hybrid_property
-    def submenus_in(self):
+    def submenus_in(self) -> int:
         return len([s for s in self.submenu])
 
     @hybrid_property
-    def dishes_in(self):
+    def dishes_in(self) -> int:
         return sum(s.dishes_in for s in self.submenu)
 
 
@@ -45,7 +45,7 @@ class SubMenu(Base):
     )
 
     @hybrid_property
-    def dishes_in(self):
+    def dishes_in(self) -> int:
         return len([d for d in self.dishes])
 
 
@@ -65,8 +65,8 @@ engine: Engine = create_engine(URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def get_db():
-    db = SessionLocal()
+def get_db() -> Session:
+    db: Session = SessionLocal()
     try:
         return db
     finally:

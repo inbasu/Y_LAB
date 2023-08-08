@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from httpx import Response
 
 from app.main import v1
 
@@ -15,69 +16,67 @@ updated_menu = {
 }
 
 
-def test_get_empty_menus():
-    response = client.get('/menus')
+def test_get_empty_menus() -> None:
+    response: Response = client.get('/menus')
     assert response.status_code == 200, ' Wrong status code'
     assert response.json() == [], 'Menu list not empty'
 
 
-def test_create_menu():
-    response = client.post('/menus', json=menu)
+def test_create_menu() -> None:
+    response: Response = client.post('/menus', json=menu)
     assert response.status_code == 201, ' Wrong status code'
+    data = response.json()
+    assert data['id'] == 1, 'Wrong id'
+    assert data['title'] == menu['title'], 'Wrong title'
+    assert data['description'] == menu['description'], 'Wrong description'
 
-    response = response.json()
-    assert response['id'] == 1, 'Wrong id'
-    assert response['title'] == menu['title'], 'Wrong title'
-    assert response['description'] == menu['description'], 'Wrong description'
 
-
-def test_get_new_menu():
-    response = client.get('/menus/1')
+def test_get_new_menu() -> None:
+    response: Response = client.get('/menus/1')
     assert response.status_code == 200, ' Wrong status code'
-    response = response.json()
-    assert response['id'] == 1
-    assert response['title'] == menu['title'], 'Wrong title'
-    assert response['description'] == menu['description'], 'Wrong description'
+    data = response.json()
+    assert data['id'] == 1
+    assert data['title'] == menu['title'], 'Wrong title'
+    assert data['description'] == menu['description'], 'Wrong description'
 
 
-def test_get_menus():
-    response = client.get('/menus')
+def test_get_menus() -> None:
+    response: Response = client.get('/menus')
     assert response.status_code == 200, ' Wrong status code'
-    response = response.json()
-    assert response != [], 'Menu list not empty'
+    assert response.json() != [], 'Menu list not empty'
 
 
-def test_update_menu():
-    response = client.patch('/menus/1', json=updated_menu)
+def test_update_menu() -> None:
+    response: Response = client.patch('/menus/1', json=updated_menu)
     assert response.status_code == 200, ' Wrong status code'
-    response = response.json()
-    assert response['id'] == 1
-    assert response['title'] == updated_menu['title'], 'Wrong title'
-    assert response['description'] == updated_menu['description'], 'Wrong description'
+    data = response.json()
+    assert data['id'] == 1
+    assert data['title'] == updated_menu['title'], 'Wrong title'
+    assert data['description'] == updated_menu['description'], 'Wrong description'
 
 
-def test_get_updated_menu():
-    response = client.get('/menus/1')
+def test_get_updated_menu() -> None:
+    response: Response = client.get('/menus/1')
     assert response.status_code == 200, ' Wrong status code'
-    response = response.json()
-    assert response['id'] == 1
-    assert response['title'] == updated_menu['title'], 'Wrong title'
-    assert response['description'] == updated_menu['description'], 'Wrong description'
+    data = response.json()
+    assert data['id'] == 1
+    assert data['title'] == updated_menu['title'], 'Wrong title'
+    assert data['description'] == updated_menu['description'], 'Wrong description'
 
 
-def test_deleted_menu():
-    response = client.delete('/menus/1')
+def test_deleted_menu() -> None:
+    response: Response = client.delete('/menus/1')
     assert response.status_code == 200, ' Wrong status code'
 
 
-def test_get_deleted_menus():
-    response = client.get('/menus')
+def test_get_deleted_menus() -> None:
+    response: Response = client.get('/menus')
     assert response.status_code == 200, ' Wrong status code'
     assert response.json() == []
 
 
-def test_get_deleted_menu():
-    response = client.get('/menus/1')
+def test_get_deleted_menu() -> None:
+    response: Response = client.get('/menus/1')
     assert response.status_code == 404, ' Wrong status code'
-    response = response.json()
-    assert response['detail'] == 'menu not found', 'Item not delete'
+    data = response.json()
+    assert data['detail'] == 'menu not found', 'Item not delete'
